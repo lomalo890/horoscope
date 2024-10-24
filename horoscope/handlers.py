@@ -1,21 +1,8 @@
 from aiogram import Router
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command
 import text
 import kb
-
-'''
-1. При регистрации бот предлагает пользователю выбрать свой знак зодиака. Используется ReplyKeyboardMarkup 3 ряда по 4 кнопки с эмоджи знака зодиака. После выбора знака бот присылает сообщение с информацией о выбранном знаке.
-2. После регистрации бот присылает гороскоп на сегодня. Сообщение включает себя текст, картинку и InlineKeyboardMarkup с одной кнопкой “Обновить”. Текст включает в себя дату гороскопа, выделенную жирным шрифтом. При нажатии на кнопку сообщение должно обновиться, и прогноз должен измениться на другой.
-3. Каждый день в 10 утра пользователь получает гороскоп на новый день (только в случае, если его еще нет).
-4. В меню бота есть команда “/update”, которая обновляет прогноз на сегодня (аналогично кнопке “Обновить” в сообщении) либо отправляет новое сообщение с гороскопом, если сообщения за сегодня по какой-то причине нет.
-5. Когда пользователь отправляет что-угодно в чат, бот пишет “Извините, я не понял”.
-6. Добавить в меню бота команду “/change_zodiac”. При нажатии появляется клавиатура, как при регистрации, и знак зодиака пользователя меняется на выбранный. Приходит новый гороскоп на сегодня.
-7. Добавить в меню бота команду “/clear_history”, которая очищает историю сообщений, оставляя только сообщение с последним выбранным знаком зодиака.
-Разворачивать бота на сервере не нужно, достаточно прислать код с локальным запуском.
-'''
-
-'''♈️ ♉️ ♊️ ♋️ ♌️ ♓️ ♒️ ♑️ ♐️ ♏️ ♎️ ♍️'''
 
 router = Router()
 
@@ -34,25 +21,17 @@ zodiac_info = {
     '♓️': 'Рыбы: Чувствительные и интуитивные.'
 }
 
-
-
-
-
-
-
-
-
 @router.message(Command("start"))
 async def start_handler(msg: Message):
     await msg.answer(text.greet.format(name=msg.from_user.full_name), reply_markup=kb.menu)
 
-@router.message()
-async def zodiac_choice(message: Message):
-    user_choice = message.text
-    info = zodiac_info[user_choice]
-    await message.answer(info)
-
-
+@router.callback_query()
+async def callback_handler(callback_query: CallbackQuery):
+    simbol = callback_query.data
+    print(simbol)
+    await callback_query.answer() 
+    await callback_query.message.answer(zodiac_info[simbol])
+    
 @router.message()
 async def message_handler(msg: Message):
     await msg.answer(f"Твой ID: {msg.from_user.id}")
